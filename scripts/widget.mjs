@@ -27,6 +27,7 @@ const app = spawn(`${bundle}/Contents/MacOS/GrokbotWidget`, [], {
     GROKBOT_PROJECT_DIR: process.cwd(),
     GROKBOT_NODE_PATH: process.execPath,
     GROKBOT_AVATAR_PATH: avatar.path,
+    GROKBOT_AVATAR_CIRCULAR: avatar.source === 'cached bot avatar' ? '1' : '0',
   },
 });
 closeSync(log);

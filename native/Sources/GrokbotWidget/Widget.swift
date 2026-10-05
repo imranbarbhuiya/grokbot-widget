@@ -188,6 +188,7 @@ struct WidgetView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let resize: (Bool) -> Void
     let avatar = ProcessInfo.processInfo.environment["GROKBOT_AVATAR_PATH"].flatMap { NSImage(contentsOfFile: $0) }
+    let circularAvatar = ProcessInfo.processInfo.environment["GROKBOT_AVATAR_CIRCULAR"] == "1"
 
     func openBot() {
         let env = ProcessInfo.processInfo.environment
@@ -261,7 +262,14 @@ struct WidgetView: View {
                 TimelineView(.animation(minimumInterval: 1.0 / 30, paused: !chat.busy || reduceMotion)) { context in
                     let wave = chat.busy && !reduceMotion ? sin(context.date.timeIntervalSinceReferenceDate * .pi * 1.6) : 0
                     Group {
-                    if let avatar { Image(nsImage: avatar).resizable().scaledToFit() }
+                    if let avatar {
+                        if circularAvatar {
+                            Image(nsImage: avatar).resizable().scaledToFill()
+                                .frame(width: 155, height: 155).clipShape(Circle())
+                        } else {
+                            Image(nsImage: avatar).resizable().scaledToFit()
+                        }
+                    }
                     else {
                         ZStack {
                             Circle().fill(.blue)

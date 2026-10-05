@@ -4,7 +4,7 @@ A local desktop companion for an existing Grok Bot. The first macOS prototype ha
 
 <img src="docs/widget.png" alt="Floating Ciel widget with an expandable chat panel and a successful synthetic test reply" width="380" />
 
-The screenshot uses a custom local avatar and a synthetic test conversation. Supply your own image with `GROKBOT_AVATAR_PATH`; otherwise, the launcher looks for that bot's uploaded avatar in Grok Bot's local cache. If unavailable, it uses a simple blue dot.
+The screenshot uses a custom local avatar and a synthetic test conversation. Supply your own image with `GROKBOT_AVATAR_PATH`; otherwise, the launcher looks for that bot's uploaded avatar in Grok Bot's local cache and displays it with a circular crop. Custom images retain their original shape and transparency. If unavailable, it uses a simple blue dot.
 
 ## Local setup
 
