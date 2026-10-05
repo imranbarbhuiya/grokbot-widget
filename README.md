@@ -25,7 +25,7 @@ In a second terminal, launch the native widget:
 npm run widget
 ```
 
-Requires macOS 14+ and Xcode command-line tools. Clicking the character or compose button opens chat. Drag the character/window background to move it. Right-click for Quit. The generated app bundle is in ignored `.local/GrokbotWidget.app`; launch via the npm script so its environment is supplied.
+Requires macOS 14+ and Xcode command-line tools. Clicking the character or compose button opens chat. Drag the character or window background to move it anywhere on screen. A click still opens chat. The widget remembers its position after quitting, and opening chat keeps the panel within the current screen. Right-click for Quit. The generated app bundle is in ignored `.local/GrokbotWidget.app`; launch via the npm script so its environment is supplied.
 
 Set `GROKBOT_AGENT_NAME` in `.env` to the exact existing bot name. Use the account that owns that bot. The BDK can create an empty bot when a name does not exist; `grokbot__list` only lists configured names and previously contacted bots, so it cannot verify account ownership.
 
@@ -54,7 +54,7 @@ The published `cursor-grokbot-agents` extension provides ask, check, list, and i
 
 Live verification passed: the direct BDK test returned the requested marker from an existing bot (`created` was absent), and a second message sent through the native UI appeared as the expected reply in its chat panel. TypeScript checking and native compilation passed.
 
-The open button launches Grokbot. Set `GROKBOT_OPEN_URL` to a verified `grokbot://` link to target a specific conversation. Voice uses the same handoff; start the call inside Grokbot. No native voice embedding or universal background event feed has been verified. Widget chat history is held in memory; BDK keeps private local session state. The prototype does not restore the widget position after quitting.
+The open button launches Grokbot. Set `GROKBOT_OPEN_URL` to a verified `grokbot://` link to target a specific conversation. Voice uses the same handoff; start the call inside Grokbot. No native voice embedding or universal background event feed has been verified. Widget chat history is held in memory; BDK keeps private local session state.
 
 Source: https://www.npmjs.com/package/@cursor/bdk (bundled docs/guides/grokbot-agents.md).
 

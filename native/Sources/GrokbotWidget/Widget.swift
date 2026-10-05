@@ -94,7 +94,41 @@ final class FloatingPanel: NSPanel {
     override var canBecomeMain: Bool { true }
 }
 
-@MainActor final class AppDelegate: NSObject, NSApplicationDelegate {
+struct WindowDragSurface: NSViewRepresentable {
+    let onClick: () -> Void
+
+    final class DragView: NSView {
+        var onClick: () -> Void = {}
+        private var start = NSPoint.zero
+        private var origin = NSPoint.zero
+        private var dragging = false
+
+        override func mouseDown(with event: NSEvent) {
+            guard let window else { return }
+            start = window.convertPoint(toScreen: event.locationInWindow)
+            origin = window.frame.origin
+            dragging = false
+        }
+
+        override func mouseDragged(with event: NSEvent) {
+            guard let window else { return }
+            let point = window.convertPoint(toScreen: event.locationInWindow)
+            let dx = point.x - start.x
+            let dy = point.y - start.y
+            if hypot(dx, dy) >= 4 { dragging = true }
+            if dragging { window.setFrameOrigin(NSPoint(x: origin.x + dx, y: origin.y + dy)) }
+        }
+
+        override func mouseUp(with event: NSEvent) {
+            if !dragging { onClick() }
+        }
+    }
+
+    func makeNSView(context: Context) -> DragView { DragView() }
+    func updateNSView(_ view: DragView, context: Context) { view.onClick = onClick }
+}
+
+@MainActor final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var panel: FloatingPanel?
     func applicationDidFinishLaunching(_ notification: Notification) {
         let panel = FloatingPanel(contentRect: NSRect(x: 0, y: 0, width: 190, height: 230), styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
@@ -110,12 +144,26 @@ final class FloatingPanel: NSPanel {
             let size = expanded ? NSSize(width: 380, height: 640) : NSSize(width: 190, height: 230)
             let right = panel.frame.maxX
             let bottom = panel.frame.minY
-            panel.setFrame(NSRect(x: right - size.width, y: bottom, width: size.width, height: size.height), display: true)
+            var frame = NSRect(x: right - size.width, y: bottom, width: size.width, height: size.height)
+            if let screen = panel.screen {
+                let bounds = screen.visibleFrame
+                frame.origin.x = min(max(frame.minX, bounds.minX), bounds.maxX - size.width)
+                frame.origin.y = min(max(frame.minY, bounds.minY), bounds.maxY - size.height)
+            }
+            panel.setFrame(frame, display: true)
             if expanded { panel.makeKey(); NSApp.activate(ignoringOtherApps: true) }
         })
         if let screen = NSScreen.main {
             panel.setFrameOrigin(NSPoint(x: screen.visibleFrame.maxX - 210, y: screen.visibleFrame.minY + 30))
         }
+        if let saved = UserDefaults.standard.string(forKey: "widgetFrame") {
+            let frame = NSRectFromString(saved)
+            let origin = NSRect(origin: frame.origin, size: panel.frame.size)
+            if NSScreen.screens.contains(where: { $0.visibleFrame.contains(origin) }) {
+                panel.setFrameOrigin(origin.origin)
+            }
+        }
+        panel.delegate = self
         self.panel = panel
         panel.orderFrontRegardless()
         let menu = NSMenu()
@@ -125,6 +173,10 @@ final class FloatingPanel: NSPanel {
         item.submenu = appMenu
         menu.addItem(item)
         NSApp.mainMenu = menu
+    }
+
+    func windowDidMove(_ notification: Notification) {
+        if let panel { UserDefaults.standard.set(NSStringFromRect(panel.frame), forKey: "widgetFrame") }
     }
 }
 
@@ -205,7 +257,7 @@ struct WidgetView: View {
                 .padding(18).frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 24))
             }
-            Button { expanded.toggle(); resize(expanded) } label: {
+            ZStack {
                 TimelineView(.animation(minimumInterval: 1.0 / 30, paused: !chat.busy || reduceMotion)) { context in
                     let wave = chat.busy && !reduceMotion ? sin(context.date.timeIntervalSinceReferenceDate * .pi * 1.6) : 0
                     Group {
@@ -225,7 +277,13 @@ struct WidgetView: View {
                     .offset(y: wave * 3)
                     .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.7), value: hovering)
                 }
-            }.buttonStyle(.plain).onHover { hovering = $0 }.accessibilityLabel("Toggle \(chat.name) chat")
+                WindowDragSurface { expanded.toggle(); resize(expanded) }
+            }.frame(width: 155, height: 155)
+                .onHover { hovering = $0 }
+                .help("Drag to move; click to chat")
+                .accessibilityLabel("Toggle \(chat.name) chat")
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction { expanded.toggle(); resize(expanded) }
             HStack(spacing: 18) {
                 Button { expanded.toggle(); resize(expanded) } label: { Image(systemName: "square.and.pencil") }
                     .help("Chat with \(chat.name)")
