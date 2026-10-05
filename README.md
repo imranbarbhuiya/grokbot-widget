@@ -4,7 +4,7 @@ A local desktop companion for an existing Grok Bot. The first macOS prototype ha
 
 <img src="docs/widget.png" alt="Floating Ciel widget with an expandable chat panel and a successful synthetic test reply" width="380" />
 
-The screenshot uses a custom local avatar and a synthetic test conversation. Supply your own image with `GROKBOT_AVATAR_PATH`; without one, the widget uses a simple blue dot.
+The screenshot uses a custom local avatar and a synthetic test conversation. Supply your own image with `GROKBOT_AVATAR_PATH`; otherwise, the launcher looks for that bot's uploaded avatar in Grok Bot's local cache. If unavailable, it uses a simple blue dot.
 
 ## Local setup
 
@@ -26,6 +26,10 @@ npm run widget
 ```
 
 Requires macOS 14+ and Xcode command-line tools. Clicking the character or compose button opens chat. Drag the character or window background to move it anywhere on screen. A click still opens chat. The widget remembers its position after quitting, and opening chat keeps the panel within the current screen. Right-click for Quit. The generated app bundle is in ignored `.local/GrokbotWidget.app`; launch via the npm script so its environment is supplied.
+
+The launcher builds the Swift app, starts it independently, and returns to the terminal. “Building for debugging” is the build mode. Closing the launcher terminal or pressing Ctrl+C after launch does not quit the widget. Relaunch with `npm run widget` after quitting. Keep the separate `npm run dev` server running for chat. Native output goes to ignored `.local/widget.log`.
+
+Avatar lookup happens at launch and reads only Grok Bot's local roster and avatar cache under `~/Library/Application Support/Grok Bot`. Custom images take priority. The cache must contain an exact match for `GROKBOT_AGENT_NAME` and an available uploaded image. Missing caches, unsupported formats, built-in dot avatars, or ambiguous matches fall back to the generic dot. No credentials or private endpoints are used. This cache format is internal to the desktop app and may change; restart the widget after changing the bot's avatar.
 
 Set `GROKBOT_AGENT_NAME` in `.env` to the exact existing bot name. Use the account that owns that bot. The BDK can create an empty bot when a name does not exist; `grokbot__list` only lists configured names and previously contacted bots, so it cannot verify account ownership.
 

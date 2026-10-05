@@ -1,6 +1,7 @@
 import { spawnSync, spawn } from 'node:child_process';
 import { resolve } from 'node:path';
-import { mkdirSync, copyFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, copyFileSync, writeFileSync, openSync, closeSync } from 'node:fs';
+import { resolveAvatar } from './avatar.mjs';
 
 const build = spawnSync('swift', ['build', '--package-path', 'native'], { stdio: 'inherit' });
 if (build.status !== 0) process.exit(build.status ?? 1);
@@ -16,14 +17,21 @@ writeFileSync(`${bundle}/Contents/Info.plist`, `<?xml version="1.0" encoding="UT
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>LSUIElement</key><true/>
 </dict></plist>`);
+const avatar = await resolveAvatar(process.env);
+const log = openSync(resolve('.local/widget.log'), 'a');
 const app = spawn(`${bundle}/Contents/MacOS/GrokbotWidget`, [], {
-  stdio: 'inherit',
+  detached: true,
+  stdio: ['ignore', log, log],
   env: {
     ...process.env,
     GROKBOT_PROJECT_DIR: process.cwd(),
     GROKBOT_NODE_PATH: process.execPath,
-    GROKBOT_AVATAR_PATH: process.env.GROKBOT_AVATAR_PATH ? resolve(process.env.GROKBOT_AVATAR_PATH) : '',
+    GROKBOT_AVATAR_PATH: avatar.path,
   },
 });
+closeSync(log);
 app.on('error', (error) => { console.error(error.message); process.exitCode = 1; });
-app.on('exit', (code) => { process.exitCode = code ?? 1; });
+app.on('spawn', () => {
+  console.log(`Widget launched independently (${avatar.source}). Right-click the widget to quit.`);
+  app.unref();
+});
