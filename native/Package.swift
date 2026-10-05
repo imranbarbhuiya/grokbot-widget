@@ -5,5 +5,5 @@ let package = Package(
     name: "GrokbotWidget",
     platforms: [.macOS(.v14)],
     products: [.executable(name: "GrokbotWidget", targets: ["GrokbotWidget"])],
-    targets: [.executableTarget(name: "GrokbotWidget")]
+    targets: [.executableTarget(name: "GrokbotWidget"), .testTarget(name: "GrokbotWidgetTests", dependencies: ["GrokbotWidget"])]
 )
