@@ -98,6 +98,19 @@ The packager downloads an official Node 24 distribution, checks its SHA-256, bui
 
 The [release workflow](.github/workflows/release.yml) builds Apple silicon and Intel ZIPs and publishes them to GitHub Releases when a `v*` tag matching `package.json` is pushed. Manual workflow runs produce downloadable build artifacts without publishing. To release a new version, update `package.json` and `package-lock.json`, commit, then push the matching version tag.
 
+## Experimental Bun CLI
+
+The first direct Bun compilation succeeded, but its executable failed to read BDK's `package.json`: BDK computes its package directory from `import.meta.url`, which changes inside a standalone executable. Correcting that directory then exposed bot-module resolution failures. Enabling runtime package/TypeScript configuration loading and using Bun's native TypeScript support passed local validation, server startup, and a read-only `grokbot__list` test with BDK 0.2.18.
+
+To reproduce the prototype from a checkout with dependencies installed:
+
+```sh
+bun scripts/bun-build.mjs
+AGENT_SERVE_DISABLE_TSX=1 GROKBOT_AGENT_NAME="Your Bot" .local/bdk-bun validate --dir .
+```
+
+This build still reads installed SDK files from `node_modules`. It is not a fully self-contained executable, and fresh browser login and message delivery have not been verified on this compiled path. Published apps continue using the tested Node runtime. A standalone Bun backend needs its SDK assets and module-loading behavior packaged and tested before replacing that runtime. See [Bun's executable configuration and embedded assets](https://bun.sh/docs/bundler/executables).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
