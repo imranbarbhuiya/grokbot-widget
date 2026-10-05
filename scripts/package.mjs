@@ -42,6 +42,7 @@ try {
   await mkdir(join(resources, 'scripts'), { recursive: true });
   await mkdir(join(resources, 'grokbot-widget'), { recursive: true });
   await mkdir(join(resources, 'licenses'), { recursive: true });
+  await cp('assets/GrokbotWidget.icns', join(resources, 'GrokbotWidget.icns'));
   await cp(join(bin.stdout.trim(), 'GrokbotWidget'), join(bundle, 'Contents/MacOS/GrokbotWidget'));
   await cp(join(nodeRoot, 'bin/node'), join(resources, 'node'));
   await cp(join(nodeRoot, 'lib/node_modules/npm'), join(resources, 'npm'), { recursive: true });
@@ -58,6 +59,7 @@ try {
 <key>CFBundleDisplayName</key><string>Grokbot Widget</string>
 <key>CFBundleExecutable</key><string>GrokbotWidget</string>
 <key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleIconFile</key><string>GrokbotWidget</string>
 <key>CFBundleShortVersionString</key><string>${version}</string>
 <key>CFBundleVersion</key><string>${version}</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>

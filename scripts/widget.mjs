@@ -7,6 +7,8 @@ const build = spawnSync('swift', ['build', '--package-path', 'native'], { stdio:
 if (build.status !== 0) process.exit(build.status ?? 1);
 const bundle = resolve('.local/GrokbotWidget.app');
 mkdirSync(`${bundle}/Contents/MacOS`, { recursive: true });
+mkdirSync(`${bundle}/Contents/Resources`, { recursive: true });
+copyFileSync(resolve('assets/GrokbotWidget.icns'), `${bundle}/Contents/Resources/GrokbotWidget.icns`);
 copyFileSync(resolve('native/.build/debug/GrokbotWidget'), `${bundle}/Contents/MacOS/GrokbotWidget`);
 writeFileSync(`${bundle}/Contents/Info.plist`, `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -15,6 +17,7 @@ writeFileSync(`${bundle}/Contents/Info.plist`, `<?xml version="1.0" encoding="UT
 <key>CFBundleName</key><string>GrokbotWidget</string>
 <key>CFBundleExecutable</key><string>GrokbotWidget</string>
 <key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleIconFile</key><string>GrokbotWidget</string>
 <key>LSUIElement</key><true/>
 </dict></plist>`);
 const avatar = await resolveAvatar(process.env);

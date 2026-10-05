@@ -1,5 +1,7 @@
 # Grokbot Widget
 
+<img src="assets/logo.png" alt="Grokbot Widget logo: a silver dot companion with a blue floating chat bubble" width="128" />
+
 A local desktop companion for an existing Grok Bot. The first macOS prototype has a draggable floating character, expandable chat panel, hover feedback, a repeating pending animation, a loading indicator, and Grokbot handoff buttons. It connects to the existing bot through the official BDK extension.
 
 <img src="docs/widget.png" alt="Floating Ciel widget with an expandable chat panel and a successful synthetic test reply" width="380" />
