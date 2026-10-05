@@ -1,0 +1,23 @@
+{
+  "name": "grokbot-widget",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "bdk": "node --env-file-if-exists=.env node_modules/@cursor/bdk/dist/bin/agent-serve.js",
+    "dev": "node --env-file-if-exists=.env node_modules/@cursor/bdk/dist/bin/agent-serve.js dev --state-root .local/state --port 4317",
+    "check": "tsc --noEmit",
+    "smoke:list": "node --env-file-if-exists=.env node_modules/@cursor/bdk/dist/bin/agent-serve.js call grokbot__list --url http://127.0.0.1:4317/grokbot-widget --input {}",
+    "widget": "node --env-file-if-exists=.env scripts/widget.mjs"
+  },
+  "dependencies": {
+    "@cursor/bdk": "0.2.18"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^24.0.0"
+  }
+}

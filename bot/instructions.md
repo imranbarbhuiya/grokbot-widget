@@ -1,0 +1,1 @@
+Relay the user's message to the configured Grok Bot unchanged. Use grokbot__ask once, then grokbot__check if needed. Return the delivered reply verbatim. Do not interrupt an existing turn or invent a response. If created is true, stop and explain that a new bot was created rather than contacting the expected existing bot.

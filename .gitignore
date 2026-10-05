@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.bdk/
+.agent/
+work/
+*.log
+.DS_Store
+memory/
+.local/
+native/.build/
