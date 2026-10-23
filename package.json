@@ -17,7 +17,7 @@
     "icon": "node scripts/icon.mjs"
   },
   "dependencies": {
-    "@cursor/bdk": "0.2.18"
+    "@cursor/bdk": "0.2.28"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
